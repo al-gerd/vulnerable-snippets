@@ -16,14 +16,38 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup results file
         run: |
+          mkdir -p scan_results
           touch ./scan_results/bearer.out.json 
           git config --global --add safe.directory '*'
       - name: SAST Scan
         working-directory: .
-        run: bearer scan . ./ci/bearer.yml
+        run: bearer scan . --config-file ./ci/configs/bearer.yml --output ./scan_results/bearer.out.json
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with: 
           author_name: scanner-bot
           author_email: scanner@anynines.com
           message: '[bot] Add SAST scan results'
+          pull: '--rebase --autostash'
+  cve-scan:
+    runs-on: ubuntu-latest
+    container: avarteqgmbh/bearer-osv-scan
+    steps:
+      - name: Checkout repo inside CI runner
+        uses: actions/checkout@v4
+      - name: Setup results file
+        run: |
+          mkdir -p scan_results
+          touch ./scan_results/osv.out.json 
+          git config --global --add safe.directory '*'
+      - name: SAST Scan
+        working-directory: .
+        run: osv-scanner --json --output ./scan_results/osv.out.json -r . 
+        continue-on-error: true
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with: 
+          author_name: scanner-bot
+          author_email: scanner@anynines.com
+          message: '[bot] Add CVE scan results'
+          pull: '--rebase --autostash'
