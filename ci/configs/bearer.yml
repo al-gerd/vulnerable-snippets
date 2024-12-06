@@ -1,12 +1,11 @@
 disable-version-check: false
 log-level: info
 report:
-    fail-on-severity: critical,high,medium,low
     format: json
     no-color: false
-    output: ""
+    output: "./scan_results/bearer.out.json"
     report: security
-    severity: critical,high,medium,low,warning
+    severity: critical,high
 rule:
     disable-default-rules: false
     only-rule: []
@@ -22,6 +21,9 @@ scan:
     internal-domains: []
     parallel: 0
     quiet: true
+    exit-code: 0
     scanner:
         - secrets
+        - sast
     skip-test: true
+    skip-path: ['*/vendor']
